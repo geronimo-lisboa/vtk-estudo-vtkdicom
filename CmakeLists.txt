@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 2.8)
+#define o nome do projeto
+project(estudo-vtk-dicom)
+#pega as bibliotecas necessárias
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+find_package(GDCM REQUIRED)
+include(${GDCM_USE_FILE})
+#programa de teste da metadata
+file(GLOB teste_metadata_src "./metadata/*.h" "./metadata/*.cpp") #aglomera arquivos segundo a regra dada
+add_executable(teste-metadata ${teste_metadata_src}) #define o executável
+target_link_libraries(teste-metadata ${VTK_LIBRARIES} ${GDCM_LIBRARIES}) #liga o executável às bibliotecas.
+set_property(TARGET teste-metadata  APPEND PROPERTY LINK_FLAGS /LARGEADDRESSAWARE) #Large address aware
+#volume renderer de brinquedo
+file(GLOB volume_rendering_src "./volume-rendering/*.h" "./volume-rendering/*.cpp") #aglomera arquivos segundo a regra dada
+add_executable(volume_rendering ${volume_rendering_src}) #define o executável
+target_link_libraries(volume_rendering ${VTK_LIBRARIES} ${GDCM_LIBRARIES}) #liga o executável às bibliotecas.
+set_property(TARGET volume_rendering  APPEND PROPERTY LINK_FLAGS /LARGEADDRESSAWARE) #Large address aware
+
+
+
