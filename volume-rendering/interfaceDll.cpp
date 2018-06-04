@@ -1,6 +1,7 @@
 #include "interfaceDll.h"
 #include <iostream>
 #include <sstream>
+#include <vtkCamera.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkDICOMSorter.h>
@@ -16,6 +17,32 @@
 #include <vtkVolume.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
+#include <vtkPointWidget.h>
+#include <vtkCommand.h>
+
+class EnableEventObserver :public vtkCommand{
+public:
+	static EnableEventObserver* New(){ return new EnableEventObserver(); }
+	void Execute(vtkObject *caller, unsigned long eventId, void *callData){
+
+	}
+};
+
+class StartInteractionEventObserver :public vtkCommand{
+public:
+	static StartInteractionEventObserver* New(){ return new StartInteractionEventObserver(); }
+	void Execute(vtkObject *caller, unsigned long eventId, void *callData){
+
+	}
+};
+
+class InteractionEventObserver :public vtkCommand{
+public:
+	static InteractionEventObserver* New(){ return new InteractionEventObserver(); }
+	void Execute(vtkObject *caller, unsigned long eventId, void *callData){
+
+	}
+};
 
 #define PrintPosition {	std::stringstream ss;ss << GetCurrentTime() << ", " << __FUNCTION__ << ", " << __LINE__;std::cout << ss.str() << std::endl; }
 vtkSmartPointer<vtkStringArray> GetFileList(std::string filepath);
@@ -26,6 +53,7 @@ vtkSmartPointer<vtkMatrix4x4> patientMatrix = nullptr;
 vtkSmartPointer<vtkWin32OpenGLRenderWindow> renWin = nullptr;
 vtkSmartPointer<vtkRenderer> ren1 = nullptr;
 vtkSmartPointer<vtkWin32RenderWindowInteractor> iren = nullptr;
+vtkSmartPointer<vtkPointWidget> pointWidget = nullptr;
 
 
 void __stdcall CreateScreen(HWND handle){
@@ -83,6 +111,7 @@ void __stdcall CreateScreen(HWND handle){
 	//renWin->SetWindowId(handle);
 	ren1 = vtkSmartPointer<vtkRenderer>::New();
 	ren1->SetBackground(0.1, 0.4, 0.2);
+	ren1->GetActiveCamera()->ParallelProjectionOn();
 	renWin->AddRenderer(ren1);
 	renWin->SetSize(301, 300);
 	iren = vtkSmartPointer<vtkWin32RenderWindowInteractor>::New();
@@ -91,6 +120,17 @@ void __stdcall CreateScreen(HWND handle){
 	renWin->Render(); // make sure we have an OpenGL context.
 	ren1->AddViewProp(volume);
 	ren1->ResetCamera();
+
+	pointWidget = vtkSmartPointer<vtkPointWidget>::New();
+	pointWidget->SetInputData(loadedImage);
+	pointWidget->PlaceWidget();
+	pointWidget->SetInteractor(iren);
+	vtkSmartPointer<EnableEventObserver> enable = vtkSmartPointer<EnableEventObserver>::New();
+	pointWidget->AddObserver("EnableEvent", enable);
+	vtkSmartPointer<StartInteractionEventObserver> start = vtkSmartPointer<StartInteractionEventObserver>::New();
+	pointWidget->AddObserver("StartInteractionEvent", start);
+	vtkSmartPointer<InteractionEventObserver> interaction = vtkSmartPointer<InteractionEventObserver>::New();
+	pointWidget->AddObserver("InteractionEvent", interaction);
 }
 int _stdcall MouseMove(HWND wnd, UINT nFlags, int X, int Y){
 	PrintPosition;
