@@ -11,6 +11,13 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormPaint(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     //Coisas relativas à dll.
     handleDll:Cardinal;
@@ -38,7 +45,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   handleDll := LoadLibrary('F:\teste-vtk-dicom-lib\build\Debug\volume_rendering.dll');
   DllCreateScreen := GetProcAddress(handleDll, '_CreateScreen@4');
-  DllMouseMove := GetProcAddress(handleDll, '_LeftMouseDown@16');
+  DllMouseMove := GetProcAddress(handleDll, '_MouseMove@16');
   DllLeftMouseDown := GetProcAddress(handleDll, '_LeftMouseDown@16');
   DllLeftMouseUp := GetProcAddress(handleDll, '_LeftMouseUp@16');
   DllMiddleMouseDown := GetProcAddress(handleDll, '_MiddleMouseDown@16');
@@ -58,6 +65,51 @@ end;
 procedure TForm1.FormPaint(Sender: TObject);
 begin
   DllRender();
+end;
+
+procedure TForm1.FormResize(Sender: TObject);
+begin
+  DllResize(Self.width, Self.Height);
+end;
+
+procedure TForm1.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  DllMouseMove(self.handle, 0, X,Y);
+end;
+
+procedure TForm1.FormMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if(Button=mbLeft)then
+  begin
+    DllLeftMouseDown(self.handle, 0, X,Y);
+  end;
+  if(Button=mbMiddle)then
+  begin
+    DllMiddleMouseDown(self.handle, 0, X,Y);
+  end;
+  if(Button=mbRight)then
+  begin
+    DllRightMouseDown(self.handle, 0, X,Y);
+  end;
+end;
+
+procedure TForm1.FormMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if(Button=mbLeft)then
+  begin
+    DllLeftMouseUp(self.handle, 0, X,Y);
+  end;
+  if(Button=mbMiddle)then
+  begin
+    DllMiddleMouseUp(self.handle, 0, X,Y);
+  end;
+  if(Button=mbRight)then
+  begin
+    DllRightMouseUp(self.handle, 0, X,Y);
+  end;
 end;
 
 end.
