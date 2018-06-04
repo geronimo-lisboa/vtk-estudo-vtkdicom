@@ -87,7 +87,6 @@ int main(int argc, char** argv){
 	ren1->ResetCamera();
 	// Render composite. In default mode. For coverage.
 	renWin->Render();
-
 	iren->Start();
 	return EXIT_SUCCESS;
 }

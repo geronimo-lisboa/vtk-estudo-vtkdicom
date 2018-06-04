@@ -13,7 +13,7 @@ target_link_libraries(teste-metadata ${VTK_LIBRARIES} ${GDCM_LIBRARIES}) #liga o
 set_property(TARGET teste-metadata  APPEND PROPERTY LINK_FLAGS /LARGEADDRESSAWARE) #Large address aware
 #volume renderer de brinquedo
 file(GLOB volume_rendering_src "./volume-rendering/*.h" "./volume-rendering/*.cpp") #aglomera arquivos segundo a regra dada
-add_executable(volume_rendering ${volume_rendering_src}) #define o executável
+add_library(volume_rendering SHARED ${volume_rendering_src}) #define o executável
 target_link_libraries(volume_rendering ${VTK_LIBRARIES} ${GDCM_LIBRARIES}) #liga o executável às bibliotecas.
 set_property(TARGET volume_rendering  APPEND PROPERTY LINK_FLAGS /LARGEADDRESSAWARE) #Large address aware
 
