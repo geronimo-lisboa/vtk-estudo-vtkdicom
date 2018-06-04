@@ -17,14 +17,16 @@
 #include <vtkVolume.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
+#include <vtkSeedRepresentation.h>
 #include <vtkPointWidget.h>
 #include <vtkCommand.h>
+#define PrintPosition {	std::stringstream ss;ss << GetCurrentTime() << ", " << __FUNCTION__ << ", " << __LINE__;std::cout << ss.str() << std::endl; }
 
 class EnableEventObserver :public vtkCommand{
 public:
 	static EnableEventObserver* New(){ return new EnableEventObserver(); }
 	void Execute(vtkObject *caller, unsigned long eventId, void *callData){
-
+		PrintPosition;
 	}
 };
 
@@ -32,7 +34,7 @@ class StartInteractionEventObserver :public vtkCommand{
 public:
 	static StartInteractionEventObserver* New(){ return new StartInteractionEventObserver(); }
 	void Execute(vtkObject *caller, unsigned long eventId, void *callData){
-
+		PrintPosition;
 	}
 };
 
@@ -40,11 +42,11 @@ class InteractionEventObserver :public vtkCommand{
 public:
 	static InteractionEventObserver* New(){ return new InteractionEventObserver(); }
 	void Execute(vtkObject *caller, unsigned long eventId, void *callData){
-
+		PrintPosition;
 	}
 };
 
-#define PrintPosition {	std::stringstream ss;ss << GetCurrentTime() << ", " << __FUNCTION__ << ", " << __LINE__;std::cout << ss.str() << std::endl; }
+
 vtkSmartPointer<vtkStringArray> GetFileList(std::string filepath);
 
 
@@ -131,6 +133,8 @@ void __stdcall CreateScreen(HWND handle){
 	pointWidget->AddObserver("StartInteractionEvent", start);
 	vtkSmartPointer<InteractionEventObserver> interaction = vtkSmartPointer<InteractionEventObserver>::New();
 	pointWidget->AddObserver("InteractionEvent", interaction);
+	pointWidget->On();
+
 }
 int _stdcall MouseMove(HWND wnd, UINT nFlags, int X, int Y){
 	PrintPosition;
