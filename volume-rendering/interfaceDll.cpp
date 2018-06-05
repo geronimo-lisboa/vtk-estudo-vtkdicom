@@ -128,7 +128,7 @@ void __stdcall CreateScreen(HWND handle){
 
 	/////CRIAÇÃO DA TELA
 	renWin = vtkSmartPointer<vtkWin32OpenGLRenderWindow>::New();
-	//renWin->SetWindowId(handle);
+	renWin->SetWindowId(handle);
 	ren1 = vtkSmartPointer<vtkRenderer>::New();
 	ren1->SetBackground(0.1, 0.4, 0.2);
 	ren1->GetActiveCamera()->ParallelProjectionOn();
