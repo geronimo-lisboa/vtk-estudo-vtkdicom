@@ -39,10 +39,27 @@ public:
 };
 
 class InteractionEventObserver :public vtkCommand{
+private:
+	vtkSmartPointer<vtkPolyData>PolyData;
+	vtkSmartPointer<vtkMatrix4x4> patientMatrix;
+	InteractionEventObserver(){
+		PolyData = vtkSmartPointer<vtkPolyData>::New();
+		patientMatrix = nullptr;
+	}
 public:
 	static InteractionEventObserver* New(){ return new InteractionEventObserver(); }
+	void SetPatientMatrix(vtkSmartPointer<vtkMatrix4x4> mat){
+		patientMatrix = mat;
+	}
 	void Execute(vtkObject *caller, unsigned long eventId, void *callData){
 		PrintPosition;
+		vtkPointWidget *pointWidget = reinterpret_cast<vtkPointWidget*>(caller);
+		pointWidget->GetPolyData(this->PolyData);
+		double position[3];
+		pointWidget->GetPosition(position);
+		std::cout << "   cursor: "
+			<< std::fixed << std::setprecision(4)
+			<< position[0] << ", " << position[1] << ", " << position[2] << std::endl;
 	}
 };
 
@@ -107,6 +124,7 @@ void __stdcall CreateScreen(HWND handle){
 	vtkSmartPointer<vtkVolume> volume = vtkSmartPointer<vtkVolume>::New();
 	volume->SetMapper(volumeMapper);
 	volume->SetProperty(volumeProperty);
+	volume->SetUserMatrix(patientMatrix);
 
 	/////CRIAÇÃO DA TELA
 	renWin = vtkSmartPointer<vtkWin32OpenGLRenderWindow>::New();
@@ -124,16 +142,21 @@ void __stdcall CreateScreen(HWND handle){
 	ren1->ResetCamera();
 
 	pointWidget = vtkSmartPointer<vtkPointWidget>::New();
-	pointWidget->SetInputData(loadedImage);
-	pointWidget->PlaceWidget();
+	pointWidget->SetProp3D(volume);
+	//pointWidget->SetInputData(loadedImage);
 	pointWidget->SetInteractor(iren);
 	vtkSmartPointer<EnableEventObserver> enable = vtkSmartPointer<EnableEventObserver>::New();
 	pointWidget->AddObserver("EnableEvent", enable);
 	vtkSmartPointer<StartInteractionEventObserver> start = vtkSmartPointer<StartInteractionEventObserver>::New();
 	pointWidget->AddObserver("StartInteractionEvent", start);
 	vtkSmartPointer<InteractionEventObserver> interaction = vtkSmartPointer<InteractionEventObserver>::New();
+	interaction->SetPatientMatrix(patientMatrix);
 	pointWidget->AddObserver("InteractionEvent", interaction);
 	pointWidget->On();
+	pointWidget->PlaceWidget();
+
+
+
 
 }
 int _stdcall MouseMove(HWND wnd, UINT nFlags, int X, int Y){
